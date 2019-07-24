@@ -34,6 +34,14 @@ class Users(Resource):
 
 
 class UsersList(Resource):
+    def get(self):
+        users = User.query.all()
+
+        return {
+            'payload': [user.to_json() for user in users],
+            'status': 'success',
+        }, 200
+
     def post(self):
         data = request.get_json()
 

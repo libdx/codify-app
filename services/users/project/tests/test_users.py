@@ -18,6 +18,24 @@ class TestUserService(BaseTestCase):
 
         self.user1 = user1
         self.user2 = user2
+
+    def test_get_all_users(self):
+        """ GET /users returns list of all users """
+
+        users = [self.user1, self.user2]
+
+        with self.client:
+            response = self.client.get('/users')
+            data = json.loads(response.data.decode())
+            payload = data.get('payload')
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(payload), 2)
+            self.assertEqual(users[0].username, payload[0]['username'])
+            self.assertEqual(users[0].email, payload[0]['email'])
+            self.assertEqual(users[1].username, payload[1]['username'])
+            self.assertEqual(users[1].email, payload[1]['email'])
+            self.assertIn('success', data['status'])
     
     def test_get_user(self):
         """ GET /users/:id returns correct user """
@@ -37,6 +55,7 @@ class TestUserService(BaseTestCase):
 
     def test_get_user_by_invalid_id(self):
         """ GET /users/:id with invalid id returns as error """
+
         id = self.user1.id + self.user2.id
         with self.client:
             response = self.client.get(f'/users/{id}')
