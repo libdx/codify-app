@@ -2,9 +2,49 @@ import json
 import unittest
 
 from project.tests.base import BaseTestCase
+from project import db
+from project.api.models import User
 
 class TestUserService(BaseTestCase):
     """ Tests for `users` Service """
+
+    def setUp(self):
+        super().setUp()
+
+        user1 = User(username='tom', email='tom@example.com')
+        user2 = User(username='jarry', email='jarry@example.com')
+        db.session.add_all([user1, user2])
+        db.session.commit()
+
+        self.user1 = user1
+        self.user2 = user2
+    
+    def test_get_user(self):
+        """ GET /users/:id returns correct user """
+
+        user = self.user1
+
+        with self.client:
+            response = self.client.get(f'/users/{user.id}')
+            data = json.loads(response.data.decode())
+            payload = data.get('payload')
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(user.id, payload['id'])
+            self.assertEqual(user.email, payload['email'])
+            self.assertEqual(user.username, payload['username'])
+            self.assertIn('success', data['status'])
+
+    def test_get_user_by_invalid_id(self):
+        """ GET /users/:id with invalid id returns as error """
+        id = self.user1.id + self.user2.id
+        with self.client:
+            response = self.client.get(f'/users/{id}')
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 404)
+            self.assertIn('Invalid payload', data['message'])
+            self.assertIn('fail', data['status'])
 
     def test_users(self):
         """ GET /users/ping returns correct response """

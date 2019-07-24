@@ -15,6 +15,24 @@ class UsersPing(Resource):
             'message': 'pong'
         }
 
+class Users(Resource):
+    def get(self, user_id):
+        """ Returns single user """
+        
+        user = User.query.filter_by(id=user_id).first()
+
+        if user:
+            return {
+                'payload': user.to_json(),
+                'status': 'success',
+            }, 200
+        else:
+            return {
+                'message': 'Invalid payload',
+                'status': 'fail',
+            }, 404
+
+
 class UsersList(Resource):
     def post(self):
         data = request.get_json()
@@ -64,45 +82,7 @@ class UsersList(Resource):
                 'status': 'fail'
             }, 400
 
-
-
-#        post_data = request.get_json()
-#        email = post_data.get('email')
-#        username = post_data.get('username') or email
-#        user = User(username=username, email=email)
-#
-#        if not email:
-#            response_data = {
-#                'message': 'Invalid payload. No "email" key given',
-#                'status': 'fail',
-#            }
-#            return response_data, 400
-#        
-#        try:
-#            user = User.query.filter_by(email=email).first()
-#            if not user:
-#                user = User(username=username, email=email)
-#                db.session.add(user)
-#                db.session.commit()
-#                response_data = {
-#                    'status': 'success',
-#                    'message': f'{email} has been added'
-#                }
-#                return response_data, 201
-#            else:
-#                response_data = {
-#                    'message': 'Invalid email. Given email already exists.',
-#                    'status': 'fail',
-#                }
-#                return response_data, 400
-#        except exc.IntegrityError:
-#            db.session.rollback()
-#            response_data = {
-#                'message': 'Invalid username. Given username already exists.',
-#                'status': 'fail',
-#            }
-#            return response_data, 400
-
 api.add_resource(UsersPing, '/users/ping')
 api.add_resource(UsersList, '/users')
+api.add_resource(Users, '/users/<user_id>')
 
