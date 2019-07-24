@@ -18,7 +18,8 @@ def create_app(script_info=None):
 
     @app.shell_context_processor
     def ctx():
-        return {'app': app, 'db': db}
+        from project.api.models import User
+        return {'app': app, 'db': db, 'User': User}
 
     return app
 
