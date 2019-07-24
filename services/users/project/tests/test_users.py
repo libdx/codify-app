@@ -12,7 +12,7 @@ class TestUserService(BaseTestCase):
         super().setUp()
 
         user1 = User(username='tom', email='tom@example.com')
-        user2 = User(username='jarry', email='jarry@example.com')
+        user2 = User(username='jerry', email='jerry@example.com')
         db.session.add_all([user1, user2])
         db.session.commit()
 
