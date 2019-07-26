@@ -1,12 +1,33 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, render_template
 from flask_restful import Resource, Api
 from sqlalchemy import exc
 
 from project import db
 from project.api.models import User
 
-blueprint = Blueprint('users', __name__)
+blueprint = Blueprint('users', __name__, template_folder='./templates')
 api = Api(blueprint)
+
+@blueprint.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        add_user(request.form)
+    return render_users()
+
+def render_users():
+    users = User.query.all()
+    return render_template('index.html', users=users)
+
+def add_user(payload):
+    """ Adds new user to database.
+    For simplicity assume validation on web page works always correctly,
+    don't handle cases with invalid payload (missing keys). """
+    username = payload['username']
+    email = payload['email']
+
+    user = User(username=username, email=email)
+    db.session.add(user)
+    db.session.commit()
 
 class UsersPing(Resource):
     def get(self):

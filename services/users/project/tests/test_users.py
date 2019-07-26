@@ -5,19 +5,61 @@ from project.tests.base import BaseTestCase
 from project import db
 from project.api.models import User
 
-class TestUserService(BaseTestCase):
-    """ Tests for `users` Service """
-
-    def setUp(self):
-        super().setUp()
-
+def seed_users(db):
         user1 = User(username='tom', email='tom@example.com')
         user2 = User(username='jerry', email='jerry@example.com')
         db.session.add_all([user1, user2])
         db.session.commit()
 
-        self.user1 = user1
-        self.user2 = user2
+        return user1, user2
+
+class TestUserServiceWeb(BaseTestCase):
+    """ Tests for `users` Web Service """
+
+    def test_main_page_when_no_users(self):
+        with self.client as client:
+            response = client.get('/')
+            data = response.data.decode()
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('All Users', data)
+            self.assertIn('No Users', data)
+
+    def test_main_page_when_users_exist(self):
+        user1, user2 = seed_users(db)
+
+        with self.client as client:
+            response = client.get('/')
+            data = response.data.decode()
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('All Users', data)
+            self.assertNotIn('No Users', data)
+            self.assertIn(user1.username, data)
+            self.assertIn(user2.username, data)
+
+    def test_main_page_add_user(self):
+
+        payload = {'username': 'joe', 'email': 'joe@example.com'}
+
+        with self.client as client:
+            response = client.post(
+                '/',
+                data=payload,
+                follow_redirects=True
+            )
+            data = response.data.decode()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('All Users', data)
+            self.assertNotIn('No Users', data)
+            self.assertIn(payload['username'], data)
+
+class TestUserServiceAPI(BaseTestCase):
+    """ Tests for `users` API Service """
+
+    def setUp(self):
+        super().setUp()
+
+        self.user1, self.user2 = seed_users(db)
 
     def test_get_all_users(self):
         """ GET /users returns list of all users """
