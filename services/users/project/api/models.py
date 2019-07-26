@@ -24,4 +24,3 @@ class User(db.Model):
             'email': self.email,
             'active': self.active,
         }
-

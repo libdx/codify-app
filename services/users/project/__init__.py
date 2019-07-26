@@ -1,9 +1,10 @@
 import os
 
-from flask import Flask 
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
 
 def create_app(script_info=None):
     app = Flask(__name__)
@@ -14,12 +15,13 @@ def create_app(script_info=None):
     db.init_app(app)
 
     from project.api.users import blueprint as users_blueprint
+
     app.register_blueprint(users_blueprint)
 
     @app.shell_context_processor
     def ctx():
         from project.api.models import User
+
         return {'app': app, 'db': db, 'User': User}
 
     return app
-

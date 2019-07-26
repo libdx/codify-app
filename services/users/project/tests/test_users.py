@@ -5,13 +5,15 @@ from project.tests.base import BaseTestCase
 from project import db
 from project.api.models import User
 
-def seed_users(db):
-        user1 = User(username='tom', email='tom@example.com')
-        user2 = User(username='jerry', email='jerry@example.com')
-        db.session.add_all([user1, user2])
-        db.session.commit()
 
-        return user1, user2
+def seed_users(db):
+    user1 = User(username='tom', email='tom@example.com')
+    user2 = User(username='jerry', email='jerry@example.com')
+    db.session.add_all([user1, user2])
+    db.session.commit()
+
+    return user1, user2
+
 
 class TestUserServiceWeb(BaseTestCase):
     """ Tests for `users` Web Service """
@@ -41,17 +43,14 @@ class TestUserServiceWeb(BaseTestCase):
         payload = {'username': 'joe', 'email': 'joe@example.com'}
 
         with self.client as client:
-            response = client.post(
-                '/',
-                data=payload,
-                follow_redirects=True
-            )
+            response = client.post('/', data=payload, follow_redirects=True)
             data = response.data.decode()
 
             self.assertEqual(response.status_code, 200)
             self.assertIn('All Users', data)
             self.assertNotIn('No Users', data)
             self.assertIn(payload['username'], data)
+
 
 class TestUserServiceAPI(BaseTestCase):
     """ Tests for `users` API Service """
@@ -78,7 +77,7 @@ class TestUserServiceAPI(BaseTestCase):
             self.assertEqual(users[1].username, payload[1]['username'])
             self.assertEqual(users[1].email, payload[1]['email'])
             self.assertIn('success', data['status'])
-    
+
     def test_get_user(self):
         """ GET /users/:id returns correct user """
 
@@ -120,19 +119,14 @@ class TestUserServiceAPI(BaseTestCase):
 
     def test_add_user(self):
         """ POST /users creates new user """
-        
+
         username = 'joe'
         email = 'joe.doe@example.com'
-        data = json.dumps({
-            'username': username,
-            'email': email
-        })
+        data = json.dumps({'username': username, 'email': email})
 
         with self.client:
             response = self.client.post(
-                '/users',
-                data=data,
-                content_type='application/json'
+                '/users', data=data, content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
@@ -149,9 +143,7 @@ class TestUserServiceAPI(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/users',
-                data=data,
-                content_type='application/json',
+                '/users', data=data, content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -168,9 +160,7 @@ class TestUserServiceAPI(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/users',
-                data=data,
-                content_type='application/json',
+                '/users', data=data, content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -185,26 +175,14 @@ class TestUserServiceAPI(BaseTestCase):
         username2 = 'jane'
         email = 'joe.doe@example.com'
 
-        data1 = json.dumps({
-            'username': username1,
-            'email': email
-        })
+        data1 = json.dumps({'username': username1, 'email': email})
 
-        data2 =  json.dumps({
-            'username': username2,
-            'email': email
-        })
+        data2 = json.dumps({'username': username2, 'email': email})
 
         with self.client:
-            self.client.post(
-                '/users',
-                data=data1,
-                content_type='application/json',
-            )
+            self.client.post('/users', data=data1, content_type='application/json')
             response = self.client.post(
-                '/users',
-                data=data2,
-                content_type='application/json',
+                '/users', data=data2, content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -220,26 +198,14 @@ class TestUserServiceAPI(BaseTestCase):
         email1 = 'joe.doe@example.com'
         email2 = 'jane.doe@example.com'
 
-        data1 = json.dumps({
-            'username': username,
-            'email': email1
-        })
+        data1 = json.dumps({'username': username, 'email': email1})
 
-        data2 =  json.dumps({
-            'username': username,
-            'email': email2
-        })
+        data2 = json.dumps({'username': username, 'email': email2})
 
         with self.client:
-            self.client.post(
-                '/users',
-                data=data1,
-                content_type='application/json',
-            )
+            self.client.post('/users', data=data1, content_type='application/json')
             response = self.client.post(
-                '/users',
-                data=data2,
-                content_type='application/json',
+                '/users', data=data2, content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -248,6 +214,6 @@ class TestUserServiceAPI(BaseTestCase):
             self.assertIn('exists', data['message'])
             self.assertIn('fail', data['status'])
 
+
 if __name__ == '__main__':
     unittest.main()
-
