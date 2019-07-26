@@ -1,4 +1,7 @@
+htmlcov
+migrations
 env
 .dockerignore
 Dockerfile
 Dockerfile-prod
+
