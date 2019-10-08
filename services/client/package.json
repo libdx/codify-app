@@ -21,7 +21,10 @@
   "eslintConfig": {
     "extends": "react-app",
     "rules": {
-      "semi": ["error", "always"]
+      "semi": [
+        "error",
+        "always"
+      ]
     }
   },
   "browserslist": {
@@ -37,6 +40,8 @@
     ]
   },
   "devDependencies": {
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
     "flow-bin": "^0.104.0",
     "flow-typed": "^2.6.0"
   }
